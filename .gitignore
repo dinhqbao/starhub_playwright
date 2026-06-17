@@ -1,0 +1,8 @@
+node_modules/
+.auth/
+dist/
+playwright-report/
+test-results/
+.env
+*.local
+.vscode/settings.json
