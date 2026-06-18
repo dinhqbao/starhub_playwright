@@ -32,7 +32,7 @@ export default defineConfig({
         headless: process.env.HEADLESS !== 'false',
         trace: 'on-first-retry',
         screenshot: 'on',
-        video: 'on-first-retry',
+        video: 'on',
         launchOptions: {
             slowMo: Number(process.env.SLOW_MO) || 0,
         },
@@ -73,7 +73,7 @@ export default defineConfig({
         {
             name: 'app-android',
             testMatch: 'tests/app/*.spec.ts',
-            dependencies: authFile ? ['app-setup'] : [],
+            dependencies: authFile ? ['web-setup'] : [],
             use: {
                 ...devices['Galaxy S24'],
                 baseURL: BASE_URL,
