@@ -23,7 +23,7 @@ export default defineConfig({
     workers: process.env.CI ? 1 : undefined,
     reporter: [['html', { open: 'always' }], ['list']],
 
-    timeout: 60_000,
+    timeout: 90_000,
     expect: {
         timeout: 10_000,
     },

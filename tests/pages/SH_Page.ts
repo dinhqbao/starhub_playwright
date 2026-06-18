@@ -59,8 +59,8 @@ export class SH_Page {
         if (!Number.isNaN(count) && count >= 1) {
             await this.emptyCart_web();
             await this.goto();
+            console.log(`[broadband] cart cleared`);
         }
-        console.log(`[broadband] cart cleared`);
     }
 
     private async emptyCart() {
@@ -97,11 +97,11 @@ export class SH_Page {
         await this.page.getByRole('button', { name: 'Skip' }).click();
     }
 
-    async waitSecond(timeoutMs: number = 1000) {
+    async waitSecond(timeoutMs: number = 1_000) {
         await this.page.waitForTimeout(timeoutMs);
     }
 
-    async waitForLoad(timeoutMs: number = 5000) {
+    async waitForLoad(timeoutMs: number = 10_000) {
         await this.page.waitForLoadState('networkidle', { timeout: timeoutMs }).catch(() => {});
     }
 }

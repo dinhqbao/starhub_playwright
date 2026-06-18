@@ -22,11 +22,11 @@ async function checkSession(browser: Browser): Promise<boolean> {
 
 async function reAuthenticate(page: Page) {
     const account = getSelectedAccount();
-    const sh = new SH_Page(page, '/Torpedo/LoginMain');
     await page.getByRole('textbox', { name: 'Enter your email address' }).fill(account.email);
     await page.getByRole('textbox', { name: 'Enter your password' }).fill(account.password);
     await page.getByRole('button', { name: 'Log in with Hub ID' }).click();
-    await sh.waitForLoad();
+    // Wait until we're off the login page — confirms auth completed before capturing state
+    await page.waitForURL((url) => !url.pathname.includes('LoginMain'), { timeout: 30_000 });
 }
 
 setup('authenticate', async ({ browser }) => {
@@ -42,8 +42,8 @@ setup('authenticate', async ({ browser }) => {
     // Fresh context — no stale cookies that could interfere with login
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
-    const sh = new SH_Page(page, '/Torpedo/LoginMain');
-    await sh.goto(false);
+    const app_login = new SH_Page(page, '/Torpedo/LoginMain');
+    await app_login.goto(false);
     await reAuthenticate(page);
     await ctx.storageState({ path: authFile });
     await ctx.close();

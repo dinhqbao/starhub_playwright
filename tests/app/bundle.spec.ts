@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { SH_Page } from '../pages/SH_Page';
 
-test('test', async ({ page }) => {
+test('buy bundle', async ({ page }) => {
     const bundle = new SH_Page(page, '/Torpedo/BundlePLP?Type=broadband-entertainment');
 
     bundle.goto();

@@ -28,12 +28,13 @@ async function checkSession(browser: Browser): Promise<boolean> {
 
 async function reAuthenticate(page: Page) {
     const account = getSelectedAccount();
-    const sh = new SH_Page(page, '/personal/store/mobile-plans');
     await page.getByRole('link', { name: 'Hub ID login' }).click();
     await page.getByRole('textbox', { name: 'Enter your email address' }).fill(account.email);
     await page.getByRole('textbox', { name: 'Enter your password' }).fill(account.password);
     await page.getByRole('button', { name: 'Log in' }).click();
-    await sh.waitForLoad();
+    await page.waitForURL('**/personal/**', { timeout: 30_000 });
+    await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
+    await page.locator('div.header-profile-tooltip-name > span').first().waitFor({ state: 'visible' });
 }
 
 setup('authenticate', async ({ browser }) => {
