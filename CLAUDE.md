@@ -39,14 +39,17 @@ npm run select            # switch active test account
 
 ```
 tests/
-  web/            # Web app tests + auth.setup.ts
-  app/            # Mobile app tests + auth.setup.ts (use /Torpedo/* paths)
-  pages/          # Page Object Models (POM)
-  utils/          # Shared helpers (auth, cart)
+  web/              # Logged-in web tests + auth.setup.ts
+  app/              # Logged-in app tests + auth.setup.ts (use /Torpedo/* paths)
+  nonlogin/
+    web/            # Non-login web tests
+    app/            # Non-login app tests
+  pages/            # Page Object Models (POM)
+  utils/            # Shared helpers (auth)
 playwright.config.ts
-accounts.csv      # Test accounts — mark one row selected=true
-.env              # Local env — never commit
-.env.example      # Committed template
+accounts.csv        # Test accounts — mark one row selected=true
+.env                # Local env — never commit
+.env.example        # Committed template
 ```
 
 ## Environment variables
@@ -55,17 +58,19 @@ accounts.csv      # Test accounts — mark one row selected=true
 |----------|-------------|---------|
 | `BASE_URL` | Base URL for all tests | `https://starhubltd-tst.outsystemsenterprise.com` |
 | `HEADLESS` | Run headless | `true` |
-| `SLOW_MO` | Slow motion delay (ms) | `0` |
+| `SLOW_MO` | Slow motion delay (ms) | `1000` |
 | `DEFAULT_PASSWORD` | Fallback password for accounts.csv rows with no password | `Slice1234` |
 
 ## Playwright projects
 
-| Project | testMatch | Notes |
-|---------|-----------|-------|
-| `web-setup` | `**/web/*.setup.ts` | Saves auth state for web |
-| `app-setup` | `**/app/*.setup.ts` | Saves auth state for app |
-| `web-chromium` | `**/web/*.spec.ts` | Desktop Chrome, depends on `web-setup` |
-| `app-android` | `**/app/*.spec.ts` | 320×700 viewport, depends on `app-setup` |
+| Project | testMatch | Device | Notes |
+|---------|-----------|--------|-------|
+| `web-setup` | `**/web/*.setup.ts` | Desktop Chrome | Saves auth state for web |
+| `app-setup` | `**/app/*.setup.ts` | Galaxy S24 | Saves auth state for app |
+| `web-chromium` | `tests/web/*.spec.ts` | Desktop Chrome | Depends on `web-setup` |
+| `app-android` | `tests/app/*.spec.ts` | Galaxy S24 | Depends on `app-setup` |
+| `app-nonlogin` | `tests/nonlogin/app/*.spec.ts` | Galaxy S24 viewport | No auth dependency |
+| `web-nonlogin` | `tests/nonlogin/web/*.spec.ts` | Desktop Chrome | No auth dependency |
 
 ## Auth flow
 
