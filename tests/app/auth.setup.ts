@@ -1,7 +1,8 @@
-import { test as setup, Browser } from '@playwright/test';
+import { test as setup, Browser, Page } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { getSelectedAccount, getAuthFilePath } from '../utils/auth';
+import { SH_Page } from '../pages/SH_Page';
 
 dotenv.config();
 
@@ -11,12 +12,21 @@ const authFile = getAuthFilePath(account.email);
 async function checkSession(browser: Browser): Promise<boolean> {
     const ctx = await browser.newContext({ storageState: authFile });
     const page = await ctx.newPage();
-    await page.goto('/Torpedo/More');
-    await page.waitForLoadState('networkidle');
+    const sh = new SH_Page(page, '/Torpedo/More');
+    await sh.goto(false);
     const isLoggedIn = !page.url().includes('LoginMain');
     if (isLoggedIn) await ctx.storageState({ path: authFile });
     await ctx.close();
     return isLoggedIn;
+}
+
+async function reAuthenticate(page: Page) {
+    const account = getSelectedAccount();
+    const sh = new SH_Page(page, '/Torpedo/LoginMain');
+    await page.getByRole('textbox', { name: 'Enter your email address' }).fill(account.email);
+    await page.getByRole('textbox', { name: 'Enter your password' }).fill(account.password);
+    await page.getByRole('button', { name: 'Log in with Hub ID' }).click();
+    await sh.waitForLoad();
 }
 
 setup('authenticate', async ({ browser }) => {
@@ -32,17 +42,10 @@ setup('authenticate', async ({ browser }) => {
     // Fresh context — no stale cookies that could interfere with login
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
-    await page.goto('/Torpedo/LoginMain');
+    const sh = new SH_Page(page, '/Torpedo/LoginMain');
+    await sh.goto(false);
     await reAuthenticate(page);
     await ctx.storageState({ path: authFile });
     await ctx.close();
     console.log(`\nAuthenticated → .auth/${account.email}.json`);
 });
-
-async function reAuthenticate(page: import('@playwright/test').Page) {
-    const account = getSelectedAccount();
-    await page.getByRole('textbox', { name: 'Enter your email address' }).fill(account.email);
-    await page.getByRole('textbox', { name: 'Enter your password' }).fill(account.password);
-    await page.getByRole('button', { name: 'Log in with Hub ID' }).click();
-    await page.waitForLoadState('networkidle');
-}

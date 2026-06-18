@@ -60,7 +60,7 @@ export default defineConfig({
         // Web tests — reuse saved auth state
         {
             name: 'web-chromium',
-            testMatch: '**/web/*.spec.ts',
+            testMatch: 'tests/web/*.spec.ts',
             dependencies: authFile ? ['web-setup'] : [],
             use: {
                 ...devices['Desktop Chrome'],
@@ -72,13 +72,31 @@ export default defineConfig({
         // Mobile app tests
         {
             name: 'app-android',
-            testMatch: '**/app/*.spec.ts',
+            testMatch: 'tests/app/*.spec.ts',
             dependencies: authFile ? ['app-setup'] : [],
+            use: {
+                ...devices['Galaxy S24'],
+                baseURL: BASE_URL,
+                storageState: authFile,
+            },
+        },
+
+        // Non-login flows
+        {
+            name: 'app-nonlogin',
+            testMatch: 'tests/nonlogin/app/*.spec.ts',
             use: {
                 ...devices['Desktop Chrome'],
                 baseURL: BASE_URL,
-                storageState: authFile,
                 viewport: { width: 320, height: 700 },
+            },
+        },
+        {
+            name: 'web-nonlogin',
+            testMatch: 'tests/nonlogin/web/*.spec.ts',
+            use: {
+                ...devices['Desktop Chrome'],
+                baseURL: BASE_URL,
             },
         },
     ],

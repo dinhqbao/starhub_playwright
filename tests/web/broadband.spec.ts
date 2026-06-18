@@ -11,13 +11,11 @@ test('buy broadband', async ({ page }) => {
         )
     ).toBeVisible();
 
-    await broadband.clearCartIfNeeded();
-
     const plan = page.locator('.sn-bb-plan-card').filter({ hasText: 'Home+ Core 5Gbps' });
     await plan.getByRole('button', { name: 'Select plan' }).click();
 
     await broadband.btn_click('Skip');
     await broadband.btn_click('Skip');
     await broadband.btn_click('Proceed to checkout');
-    await broadband.wait(3000);
+    await broadband.waitForLoad();
 });
