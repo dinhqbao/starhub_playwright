@@ -1,21 +1,31 @@
 import { appTest as test } from '../fixtures';
 import { expect } from '@playwright/test';
 
-test('buy broadband', async ({ page, shPage }) => {
-    const broadband = shPage('/Torpedo/BroadbandPlansSN');
+test('presale - purchase', async ({ basePage, page }) => {
+    const p = basePage('/Torpedo/BroadbandPlansSN');
 
-    await broadband.goto();
+    await p.goto();
     await page.getByText('Home+ Core 5Gbps').click();
-    await broadband.btn_click('Next');
-    await broadband.btn_click('Skip');
-    await broadband.btn_click('Skip');
-    await broadband.btn_click('Proceed to checkout');
-    await broadband.waitForLoad();
-    await page.getByRole('button', { name: 'Get assistance' }).waitFor({ timeout: 15_000 });
+    await p.btn_click('Next');
+    await p.btn_click('Skip');
+    await p.btn_click('Skip');
+    await p.btn_click('Proceed to checkout');
+    await p.waitForLoad();
 
     await expect(page.locator('.overlay-modal')).toContainText(/We.re unable to proceed/);
     await expect(page.locator('.overlay-modal')).toContainText(
         'Your current service has a pending request or an account-related issue. To proceed, please select another option.'
     );
     await expect(page.getByRole('button', { name: 'Get assistance' })).toBeVisible();
+});
+
+test('postsale - transfer SN', async ({ basePage, page }) => {
+    const p = basePage('/Torpedo/Broadband');
+
+    await p.goto(false);
+    await page.locator('div[aa_linktext="Ready to renew"]').getByRole('link').click();
+
+    await expect(
+        page.locator('div.header-content .header-right').locator(':scope > *')
+    ).toHaveCount(0);
 });

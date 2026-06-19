@@ -1,12 +1,12 @@
-import { test, expect } from '@playwright/test';
-import { BasePage } from '../pages/SH_Page';
+import { appTest as test } from '../fixtures';
+import { expect } from '@playwright/test';
 
-test('blacklist', async ({ page }) => {
-    const broadband = new BasePage(page, '/Torpedo/OneCart_ReviewOrder');
+test('blacklist', async ({ basePage, page }) => {
+    const p = basePage('/Torpedo/OneCart_ReviewOrder');
 
-    await broadband.goto(false);
-    await broadband.btn_click('Proceed to checkout');
-    await broadband.waitForLoad();
+    await p.goto(false);
+    await p.btn_click('Proceed to checkout');
+    await p.waitForLoad();
 
     await expect(page.locator('.overlay-modal-main')).toContainText(/We.re unable to proceed/);
     const getAssistance = page.getByRole('button', { name: 'Get assistance' });

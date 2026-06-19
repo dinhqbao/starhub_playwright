@@ -1,16 +1,20 @@
 import { test as base, Page } from '@playwright/test';
-import { BasePage } from '../pages/SH_Page';
+import { BasePage, AppPage, WebPage } from '../pages/BasePage';
 import { getSelectedAccount, getAuthFilePath } from '../utils/auth';
 
 type SHFixtures = {
-    shPage: (url: string) => BasePage;
+    basePage: (url: string) => BasePage;
+};
+
+type WorkerFixtures = {
+    workerState: { isSessionRefreshed: boolean };
 };
 
 async function ensureAppSession(page: Page) {
     const account = getSelectedAccount();
     const authFile = getAuthFilePath(account.email);
 
-    const sh = new BasePage(page, '/Torpedo/More');
+    const sh = new AppPage(page, '/Torpedo/More');
     await sh.goto(false);
 
     if (page.url().includes('LoginMain')) {
@@ -19,6 +23,7 @@ async function ensureAppSession(page: Page) {
         await page.getByRole('button', { name: 'Log in with Hub ID' }).click();
         await page.waitForURL((url) => !url.pathname.includes('LoginMain'), { timeout: 30_000 });
         await page.context().storageState({ path: authFile });
+        console.log(`[auth] app session refreshed → ${authFile}`);
     }
 }
 
@@ -26,7 +31,7 @@ async function ensureWebSession(page: Page) {
     const account = getSelectedAccount();
     const authFile = getAuthFilePath(account.email);
 
-    const sh = new BasePage(page, '/personal/store/mobile-plans');
+    const sh = new WebPage(page, '/personal/store/mobile-plans');
     await sh.goto(false);
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await sh.waitForLoad();
@@ -48,25 +53,35 @@ async function ensureWebSession(page: Page) {
             .first()
             .waitFor({ state: 'visible' });
         await page.context().storageState({ path: authFile });
+        console.log(`[auth] web session refreshed → ${authFile}`);
     }
 }
 
-export const appTest = base.extend<SHFixtures>({
-    page: async ({ page }, use) => {
-        await ensureAppSession(page);
-        await use(page);
-    },
-    shPage: async ({ page }, use) => {
-        await use((url: string) => new BasePage(page, url));
-    },
-});
+function makeTest<T extends BasePage>(
+    ensureSession: (page: Page) => Promise<void>,
+    PageClass: new (page: Page, url: string) => T
+) {
+    return base.extend<SHFixtures, WorkerFixtures>({
+        workerState: [
+            async ({}, use) => {
+                await use({ isSessionRefreshed: false });
+            },
+            { scope: 'worker' },
+        ],
 
-export const webTest = base.extend<SHFixtures>({
-    page: async ({ page }, use) => {
-        await ensureWebSession(page);
-        await use(page);
-    },
-    shPage: async ({ page }, use) => {
-        await use((url: string) => new BasePage(page, url));
-    },
-});
+        page: async ({ page, workerState }, use) => {
+            if (!workerState.isSessionRefreshed) {
+                await ensureSession(page);
+                workerState.isSessionRefreshed = true;
+            }
+            await use(page);
+        },
+
+        basePage: async ({ page }, use) => {
+            await use((url: string) => new PageClass(page, url));
+        },
+    });
+}
+
+export const appTest = makeTest(ensureAppSession, AppPage);
+export const webTest = makeTest(ensureWebSession, WebPage);

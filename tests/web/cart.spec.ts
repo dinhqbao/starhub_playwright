@@ -1,12 +1,12 @@
-import { test, expect } from '@playwright/test';
-import { BasePage } from '../pages/SH_Page';
+import { webTest as test } from '../fixtures';
+import { expect } from '@playwright/test';
 
-test('blacklist', async ({ page }) => {
-    const broadband = new BasePage(page, '/personal/revieworder');
+test('blacklist', async ({ basePage, page }) => {
+    const p = basePage('/personal/revieworder');
 
-    await broadband.goto(false);
-    await broadband.btn_click('Proceed to checkout');
-    await broadband.waitForLoad();
+    await p.goto(false);
+    await p.btn_click('Proceed to checkout');
+    await p.waitForLoad();
 
     await expect(page.locator('.overlay-modal-main')).toContainText(/We.re unable to proceed/);
     await expect(page.getByRole('button', { name: 'Go to StarHub App' })).toBeVisible();

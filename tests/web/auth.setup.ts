@@ -2,7 +2,7 @@ import { test as setup, Browser, Page } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { getSelectedAccount, getAuthFilePath } from '../utils/auth';
-import { BasePage } from '../pages/SH_Page';
+import { WebPage } from '../pages/BasePage';
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ const authFile = getAuthFilePath(account.email);
 async function checkSession(browser: Browser): Promise<boolean> {
     const ctx = await browser.newContext({ storageState: authFile });
     const page = await ctx.newPage();
-    const sh = new BasePage(page, '/personal/store/mobile-plans');
+    const sh = new WebPage(page, '/personal/store/mobile-plans');
     await sh.goto(false);
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await sh.waitForLoad();
@@ -53,7 +53,7 @@ setup('authenticate', async ({ browser }) => {
     // Fresh context — no stale cookies that could interfere with login
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
-    const sh = new BasePage(page, '/personal/store/mobile-plans');
+    const sh = new WebPage(page, '/personal/store/mobile-plans');
     await sh.goto(false);
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await reAuthenticate(page);
