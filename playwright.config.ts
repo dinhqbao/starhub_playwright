@@ -10,7 +10,8 @@ const BASE_URL = process.env.BASE_URL ?? 'https://starhubltd-tst.outsystemsenter
 let authFile: string | undefined;
 try {
     const selected = getSelectedAccount();
-    authFile = getAuthFilePath(selected.email);
+    const path = getAuthFilePath(selected.email);
+    authFile = existsSync(path) ? path : undefined;
 } catch {
     authFile = undefined;
 }
@@ -39,29 +40,10 @@ export default defineConfig({
     },
 
     projects: [
-        // Runs login once and saves auth state
-        {
-            name: 'web-setup',
-            testMatch: '**/web/*.setup.ts',
-            use: {
-                ...devices['Desktop Chrome'],
-                baseURL: BASE_URL,
-            },
-        },
-        {
-            name: 'app-setup',
-            testMatch: '**/app/*.setup.ts',
-            use: {
-                ...devices['Galaxy S24'],
-                baseURL: BASE_URL,
-            },
-        },
-
-        // Web tests — reuse saved auth state
+        // Web tests — session checked per-test via webTest fixture
         {
             name: 'web-chromium',
             testMatch: 'tests/web/*.spec.ts',
-            dependencies: authFile ? ['web-setup'] : [],
             use: {
                 ...devices['Desktop Chrome'],
                 baseURL: BASE_URL,
@@ -69,11 +51,10 @@ export default defineConfig({
             },
         },
 
-        // Mobile app tests
+        // Mobile app tests — session checked per-test via appTest fixture
         {
             name: 'app-android',
             testMatch: 'tests/app/*.spec.ts',
-            dependencies: authFile ? ['web-setup'] : [],
             use: {
                 ...devices['Galaxy S24'],
                 baseURL: BASE_URL,

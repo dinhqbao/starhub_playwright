@@ -1,10 +1,9 @@
-import { test, expect } from '@playwright/test';
-import { SH_Page } from '../pages/SH_Page';
+import { appTest as test } from '../fixtures';
 
-test('buy bundle', async ({ page }) => {
-    const bundle = new SH_Page(page, '/Torpedo/BundlePLP?Type=broadband-entertainment');
+test('buy bundle', async ({ page, shPage }) => {
+    const bundle = shPage('/Torpedo/BundlePLP?Type=broadband-entertainment');
 
-    bundle.goto();
+    await bundle.goto();
     await page
         .locator('.bundle-content-item')
         .filter({ hasText: '10Gbps Ultraspeed + 1 Pass' })

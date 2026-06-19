@@ -1,6 +1,6 @@
 import { Page, TestInfo } from '@playwright/test';
 
-export class SH_Page {
+export class BasePage {
     private readonly url: string;
 
     constructor(

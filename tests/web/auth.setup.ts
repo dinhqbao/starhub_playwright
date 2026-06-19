@@ -2,7 +2,7 @@ import { test as setup, Browser, Page } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { getSelectedAccount, getAuthFilePath } from '../utils/auth';
-import { SH_Page } from '../pages/SH_Page';
+import { BasePage } from '../pages/SH_Page';
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ const authFile = getAuthFilePath(account.email);
 async function checkSession(browser: Browser): Promise<boolean> {
     const ctx = await browser.newContext({ storageState: authFile });
     const page = await ctx.newPage();
-    const sh = new SH_Page(page, '/personal/store/mobile-plans');
+    const sh = new BasePage(page, '/personal/store/mobile-plans');
     await sh.goto(false);
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await sh.waitForLoad();
@@ -34,7 +34,10 @@ async function reAuthenticate(page: Page) {
     await page.getByRole('button', { name: 'Log in' }).click();
     await page.waitForURL('**/personal/**', { timeout: 30_000 });
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
-    await page.locator('div.header-profile-tooltip-name > span').first().waitFor({ state: 'visible' });
+    await page
+        .locator('div.header-profile-tooltip-name > span')
+        .first()
+        .waitFor({ state: 'visible' });
 }
 
 setup('authenticate', async ({ browser }) => {
@@ -50,7 +53,7 @@ setup('authenticate', async ({ browser }) => {
     // Fresh context — no stale cookies that could interfere with login
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
-    const sh = new SH_Page(page, '/personal/store/mobile-plans');
+    const sh = new BasePage(page, '/personal/store/mobile-plans');
     await sh.goto(false);
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await reAuthenticate(page);

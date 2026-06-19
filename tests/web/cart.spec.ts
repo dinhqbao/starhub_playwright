@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { SH_Page } from '../pages/SH_Page';
+import { BasePage } from '../pages/SH_Page';
 
 test('blacklist', async ({ page }) => {
-    const broadband = new SH_Page(page, '/personal/revieworder');
+    const broadband = new BasePage(page, '/personal/revieworder');
 
     await broadband.goto(false);
     await broadband.btn_click('Proceed to checkout');

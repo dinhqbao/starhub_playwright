@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { webTest as test } from '../fixtures';
 import { preorderSteps, bauSteps } from './device.steps';
 
 test('preorder', async ({ page }) => {

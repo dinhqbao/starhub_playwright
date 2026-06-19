@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
-import { SH_Page } from '../pages/SH_Page';
+import { webTest as test } from '../fixtures';
+import { expect } from '@playwright/test';
 
-test('buy broadband', async ({ page }) => {
-    const broadband = new SH_Page(page, '/personal/broadband/productssn');
+test('buy broadband', async ({ page, shPage }) => {
+    const broadband = shPage('/personal/broadband/productssn');
 
     await broadband.goto();
     await expect(
