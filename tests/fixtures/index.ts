@@ -70,7 +70,7 @@ function makeTest<T extends BasePage>(
         ],
 
         page: async ({ page, workerState }, use) => {
-            if (!workerState.isSessionRefreshed) {
+            if (!workerState.isSessionRefreshed && process.env.NOAUTH !== 'true') {
                 await ensureSession(page);
                 workerState.isSessionRefreshed = true;
             }

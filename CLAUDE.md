@@ -24,8 +24,12 @@ npm run select         # pick the test account
 
 ```bash
 npm run test              # run all tests
-npm run test:web          # web tests (Chromium)
-npm run test:app          # app tests (Android viewport)
+npm run test:web          # all web tests (Chromium)
+npm run test:app          # all app tests (Android viewport)
+npm run test:web <file>   # run tests/web/<file>.spec.ts
+npm run test:app <file>   # run tests/app/<file>.spec.ts
+npm run test:web:noauth   # same as test:web but skip auth
+npm run test:app:noauth   # same as test:app but skip auth
 npm run test:app:all      # app tests (Android + iOS viewports)
 npm run test:headed       # run with visible browser
 npm run test:debug        # step-by-step debugger
@@ -35,18 +39,29 @@ npm run format            # format all files with Prettier
 npm run select            # switch active test account
 ```
 
+### Targeting a specific file or test case
+
+```bash
+npm run test:web broadband              # tests/web/broadband.spec.ts
+npm run test:app broadband postsale     # tests/app/broadband.spec.ts, grep "postsale"
+npm run test:app:noauth device          # tests/app/device.spec.ts, no auth
+npm run test:app:noauth device bau      # tests/app/device.spec.ts, grep "bau", no auth
+```
+
+`--noauth` skips loading `storageState` and bypasses `ensureSession` in the fixture — the browser starts completely unauthenticated.
+
 ## Project structure
 
 ```
 tests/
-  web/              # Logged-in web tests + auth.setup.ts
-  app/              # Logged-in app tests + auth.setup.ts (use /Torpedo/* paths)
-  nonlogin/
-    web/            # Non-login web tests
-    app/            # Non-login app tests
+  web/              # Web tests (auth or noauth)
+  app/              # App tests (auth or noauth) — use /Torpedo/* paths
   pages/            # Page Object Models (POM)
   utils/            # Shared helpers (auth)
+  fixtures/         # Shared test fixtures
 playwright.config.ts
+scripts/
+  run-test.js       # CLI helper for test:web / test:app scripts
 accounts.csv        # Test accounts — mark one row selected=true
 .env                # Local env — never commit
 .env.example        # Committed template
@@ -60,25 +75,23 @@ accounts.csv        # Test accounts — mark one row selected=true
 | `HEADLESS` | Run headless | `true` |
 | `SLOW_MO` | Slow motion delay (ms) | `1000` |
 | `DEFAULT_PASSWORD` | Fallback password for accounts.csv rows with no password | `Slice1234` |
+| `NOAUTH` | Skip storageState and ensureSession when `true` | — |
 
 ## Playwright projects
 
-| Project | testMatch | Device | Notes |
-|---------|-----------|--------|-------|
-| `web-setup` | `**/web/*.setup.ts` | Desktop Chrome | Saves auth state for web |
-| `app-setup` | `**/app/*.setup.ts` | Galaxy S24 | Saves auth state for app |
-| `web-chromium` | `tests/web/*.spec.ts` | Desktop Chrome | Depends on `web-setup` |
-| `app-android` | `tests/app/*.spec.ts` | Galaxy S24 | Depends on `app-setup` |
-| `app-nonlogin` | `tests/nonlogin/app/*.spec.ts` | Galaxy S24 viewport | No auth dependency |
-| `web-nonlogin` | `tests/nonlogin/web/*.spec.ts` | Desktop Chrome | No auth dependency |
+| Project | testMatch | Device |
+|---------|-----------|--------|
+| `web-chromium` | `tests/web/*.spec.ts` | Desktop Chrome |
+| `app-android` | `tests/app/*.spec.ts` | Galaxy S24 |
 
 ## Auth flow
 
-Auth state is stored in `.auth/<email>.json`. Both setup files follow the same pattern:
+Auth state is stored in `.auth/<email>.json`. The fixture checks session validity once per worker:
 
-1. If auth file exists → load it and verify session is still valid
-2. If valid → save refreshed tokens and exit
-3. If expired or no file → fresh context (no old cookies) → login → save tokens
+1. Load `storageState` from `.auth/<email>.json` (set in `playwright.config.ts`)
+2. Navigate to a known page and verify the session is still active
+3. If expired → re-login and save refreshed tokens
+4. If `NOAUTH=true` → skip both storageState and session check entirely
 
 Run `npm run select` to switch which account is active before running tests.
 
@@ -90,14 +103,6 @@ Run `npm run select` to switch which account is active before running tests.
 - Prefer `getByRole`, `getByLabel`, `getByText` over CSS selectors.
 - Use `test.describe` to group related tests.
 - Use `test.step` for readable traces — no `console.log` in passing tests.
-
-### Test filter tips
-
-```bash
-npx playwright test tests/web/broadband.spec.ts   # by file (use forward slashes)
-npx playwright test -g "buy broadband"             # by test name
-npx playwright test --project=app-android          # by project
-```
 
 ## Conventions
 
