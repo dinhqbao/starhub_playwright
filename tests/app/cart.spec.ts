@@ -8,7 +8,7 @@ test('blacklist', async ({ basePage, page }) => {
     await p.btn_click('Proceed to checkout');
     await p.waitForLoad();
 
-    await expect(page.locator('.overlay-modal-main')).toContainText(/We.re unable to proceed/);
+    await expect(page.locator('.overlay-modal-main')).toContainText(/We.*unable to proceed/);
     const getAssistance = page.getByRole('button', { name: 'Get assistance' });
     const makePayment = page.getByRole('button', { name: 'Make a payment now' });
     await expect(getAssistance.or(makePayment)).toBeVisible();

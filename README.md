@@ -48,6 +48,7 @@ npm run test
 ```bash
 npm run test:web        # all web tests (Desktop Chrome, with auth)
 npm run test:app        # all app tests (Galaxy S24, with auth)
+npm run test:phone      # all web tests at phone viewport (400×800, with auth)
 ```
 
 ### Run a specific file
@@ -55,6 +56,7 @@ npm run test:app        # all app tests (Galaxy S24, with auth)
 ```bash
 npm run test:web broadband      # → tests/web/broadband.spec.ts
 npm run test:app device         # → tests/app/device.spec.ts
+npm run test:phone broadband    # → tests/web/broadband.spec.ts at phone viewport
 ```
 
 ### Run a specific test case
@@ -62,6 +64,7 @@ npm run test:app device         # → tests/app/device.spec.ts
 ```bash
 npm run test:web broadband postsale     # grep "postsale" in broadband.spec.ts
 npm run test:app device bau             # grep "bau" in device.spec.ts
+npm run test:phone broadband postsale   # grep "postsale" at phone viewport
 ```
 
 ### Run without auth (no storageState, no session check)
@@ -69,6 +72,7 @@ npm run test:app device bau             # grep "bau" in device.spec.ts
 ```bash
 npm run test:app:noauth device          # tests/app/device.spec.ts, unauthenticated
 npm run test:web:noauth broadband       # tests/web/broadband.spec.ts, unauthenticated
+npm run test:phone:noauth broadband     # phone viewport, unauthenticated
 npm run test:app:noauth device bau      # + grep "bau"
 ```
 
@@ -105,7 +109,7 @@ tests/
   utils/            # Shared helpers (auth)
   fixtures/         # Shared test fixtures
 scripts/
-  run-test.js       # CLI helper for test:web / test:app scripts
+  run-test.js       # CLI helper for test:web / test:app / test:phone scripts
 playwright.config.ts
 accounts.csv        # Test accounts
 .env                # Local config — never commit
@@ -116,23 +120,27 @@ accounts.csv        # Test accounts
 
 ## Useful commands
 
-| Command                          | Description                         |
-| -------------------------------- | ----------------------------------- |
-| `npm run test`                   | Run all tests                       |
-| `npm run test:web`               | All web tests                       |
-| `npm run test:app`               | All app tests                       |
-| `npm run test:web <file>`        | Specific web file                   |
-| `npm run test:app <file>`        | Specific app file                   |
-| `npm run test:web <file> <grep>` | Specific web file + test name grep  |
-| `npm run test:app <file> <grep>` | Specific app file + test name grep  |
-| `npm run test:web:noauth`        | Web tests without auth              |
-| `npm run test:app:noauth`        | App tests without auth              |
-| `npm run test:headed`            | Run with visible browser            |
-| `npm run test:debug`             | Step-by-step debugger               |
-| `npm run test:ui`                | Playwright UI mode                  |
-| `npm run report`                 | Open last HTML report               |
-| `npm run select`                 | Switch active test account          |
-| `npm run format`                 | Format all files with Prettier      |
+| Command                            | Description                              |
+| ---------------------------------- | ---------------------------------------- |
+| `npm run test`                     | Run all tests                            |
+| `npm run test:web`                 | All web tests                            |
+| `npm run test:app`                 | All app tests                            |
+| `npm run test:phone`               | All web tests at phone viewport (400×800)|
+| `npm run test:web <file>`          | Specific web file                        |
+| `npm run test:app <file>`          | Specific app file                        |
+| `npm run test:phone <file>`        | Specific web file at phone viewport      |
+| `npm run test:web <file> <grep>`   | Specific web file + test name grep       |
+| `npm run test:app <file> <grep>`   | Specific app file + test name grep       |
+| `npm run test:phone <file> <grep>` | Phone viewport + test name grep          |
+| `npm run test:web:noauth`          | Web tests without auth                   |
+| `npm run test:app:noauth`          | App tests without auth                   |
+| `npm run test:phone:noauth`        | Phone viewport tests without auth        |
+| `npm run test:headed`              | Run with visible browser                 |
+| `npm run test:debug`               | Step-by-step debugger                    |
+| `npm run test:ui`                  | Playwright UI mode                       |
+| `npm run report`                   | Open last HTML report                    |
+| `npm run select`                   | Switch active test account               |
+| `npm run format`                   | Format all files with Prettier           |
 
 ---
 

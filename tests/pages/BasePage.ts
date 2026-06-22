@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 export class BasePage {
     protected readonly page: Page;
     private readonly url: string;
+    protected readonly cartUrl: string = '';
 
     constructor(page: Page, url: string) {
         this.page = page;
@@ -49,61 +50,66 @@ export class BasePage {
 
     async clearCart() {
         const count = await this.getCartCount();
-        console.log(`[broadband] cart count: ${count}`);
+        console.log(`[cart] items count: ${count}`);
         if (!Number.isNaN(count) && count >= 1) {
             await this.emptyCart();
             await this.goto(false);
-            console.log(`[broadband] cart cleared`);
         }
     }
 
-    protected async emptyCart(): Promise<void> {}
+    protected async emptyCart(): Promise<void> {
+        if (!this.cartUrl) return;
+        await this.page.goto(this.cartUrl);
+        await this.waitForLoad();
+        const deleteBtns = this.page
+            .locator('i.t-icon.icon-ic_fluent_delete_20_regular')
+            .filter({ visible: true });
+        while (true) {
+            var count = await deleteBtns.count();
+
+            if (count === 0) {
+                console.log(`[cart] cleared`);
+                break;
+            }
+            console.log(`[cart] delete buttons count: ${count}`);
+            await deleteBtns.first().click();
+            try {
+                const confirmBtn = this.page.getByRole('button', { name: 'Yes, delete' });
+                await confirmBtn.waitFor({ state: 'visible', timeout: 1_000 });
+                await confirmBtn.click();
+            } catch (e) {
+                console.log(e);
+                // button didn't appear, nothing to do
+            }
+            await this.waitForLoad();
+        }
+        await this.page.getByText('Your cart is empty').waitFor();
+    }
 
     async btn_click(name: string) {
         await this.page.getByRole('button', { name }).click();
+        await this.waitSecond();
     }
 
     async skip() {
         await this.page.getByRole('button', { name: 'Skip' }).click();
     }
 
-    async waitSecond(timeoutMs: number = 1_000) {
+    async waitSecond(timeoutMs: number = 500) {
         await this.page.waitForTimeout(timeoutMs);
     }
 
-    async waitForLoad(timeoutMs: number = 10_000) {
+    async waitForLoad(timeoutMs: number = 5_000) {
+        await this.waitSecond();
         await this.page.waitForLoadState('networkidle', { timeout: timeoutMs }).catch(() => {});
+        await this.waitSecond(1000);
     }
 }
 
 export class AppPage extends BasePage {
-    protected async emptyCart() {
-        await this.page.goto('/Torpedo/OneCart_ReviewOrder');
-        await this.waitForLoad();
-        while (true) {
-            const deleteBtns = this.page.locator('i.t-icon.icon-ic_fluent_delete_20_regular');
-            if ((await deleteBtns.count()) === 0) break;
-            await deleteBtns.first().click();
-            await this.waitForLoad();
-        }
-        await this.page.getByText('Your cart is empty').waitFor();
-    }
+    protected readonly cartUrl = '/Torpedo/OneCart_ReviewOrder';
 }
 
 export class WebPage extends BasePage {
-    protected async emptyCart() {
-        await this.page.goto('/personal/revieworder');
-        await this.waitForLoad();
-        while (true) {
-            const deleteBtns = this.page.locator('i.t-icon.icon-ic_fluent_delete_20_regular');
-            if ((await deleteBtns.count()) === 0) break;
-            await deleteBtns.first().click();
-            await this.waitForLoad();
-        }
-        await this.page.getByText('Your cart is empty').waitFor();
-    }
-
-    async waitForProfileTooltip() {
-        await this.page.locator('div.header-profile-tooltip-name > span').first().waitFor({ state: 'visible' });
-    }
+    protected readonly cartUrl = '/personal/revieworder';
 }

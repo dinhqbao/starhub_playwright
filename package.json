@@ -1,34 +1,36 @@
 {
-    "name": "starhub_playwright",
-    "version": "1.0.0",
-    "description": "Playwright E2E tests for StarHub web and app",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-        "test": "playwright test",
-        "test:web": "node scripts/run-test.js web",
-        "test:app": "node scripts/run-test.js app",
-        "test:web:noauth": "node scripts/run-test.js web --noauth",
-        "test:app:noauth": "node scripts/run-test.js app --noauth",
-        "test:app:all": "playwright test --project=app-android --project=app-ios",
-        "test:headed": "playwright test --headed",
-        "test:debug": "playwright test --debug",
-        "test:ui": "playwright test --ui",
-        "report": "playwright show-report",
-        "select": "node scripts/select-accounts.js",
-        "format": "prettier --write \"**/*.{ts,js,json}\""
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {
-        "@inquirer/checkbox": "^5.2.1",
-        "@inquirer/select": "^5.2.1",
-        "@playwright/test": "^1.60.0",
-        "@types/node": "^20.19.43",
-        "dotenv": "^16.6.1",
-        "prettier": "^3.8.4",
-        "prompts": "^2.4.2",
-        "typescript": "^5.9.3"
-    }
+  "name": "starhub_playwright",
+  "version": "1.0.0",
+  "description": "Playwright E2E tests for StarHub web and app",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:web": "node scripts/run-test.js web",
+    "test:app": "node scripts/run-test.js app",
+    "test:phone": "node scripts/run-test.js phone",
+    "test:web:noauth": "node scripts/run-test.js web --noauth",
+    "test:app:noauth": "node scripts/run-test.js app --noauth",
+    "test:phone:noauth": "node scripts/run-test.js phone --noauth",
+    "test:app:all": "playwright test --project=app-android --project=app-ios",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "select": "node scripts/select-accounts.js",
+    "format": "prettier --write \"**/*.{ts,js,json}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@inquirer/checkbox": "^5.2.1",
+    "@inquirer/select": "^5.2.1",
+    "@playwright/test": "^1.61.0",
+    "@types/node": "^20.19.43",
+    "dotenv": "^16.6.1",
+    "prettier": "^3.8.4",
+    "prompts": "^2.4.2",
+    "typescript": "^5.9.3"
+  }
 }

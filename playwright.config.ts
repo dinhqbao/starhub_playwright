@@ -18,28 +18,30 @@ if (process.env.NOAUTH !== 'true') {
     }
 }
 
+const use = {
+    headless: process.env.HEADLESS !== 'false',
+    trace: 'on-first-retry' as const,
+    screenshot: 'on' as const,
+    video: 'on' as const,
+    launchOptions: {
+        slowMo: Number(process.env.SLOW_MO) || 0,
+    },
+};
+
 export default defineConfig({
     testDir: './tests',
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
     workers: 1,
-    reporter: [['html', { open: 'always' }], ['list']],
+    reporter: [['html', { open: 'never' }], ['list']],
 
-    timeout: 90_000,
+    timeout: 75_000,
     expect: {
         timeout: 10_000,
     },
 
-    use: {
-        headless: process.env.HEADLESS !== 'false',
-        trace: 'on-first-retry',
-        screenshot: 'on',
-        video: 'on',
-        launchOptions: {
-            slowMo: Number(process.env.SLOW_MO) || 0,
-        },
-    },
+    use,
 
     projects: [
         {
@@ -60,5 +62,19 @@ export default defineConfig({
                 storageState: authFile,
             },
         },
+        ...(process.env.PLATFORM === 'phone'
+            ? [
+                  {
+                      name: 'web-phone',
+                      testMatch: 'tests/web/*.spec.ts',
+                      use: {
+                          ...devices['Desktop Chrome'],
+                          baseURL: BASE_URL,
+                          storageState: authFile,
+                          viewport: { width: 400, height: 800 },
+                      },
+                  },
+              ]
+            : []),
     ],
 });

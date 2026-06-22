@@ -26,10 +26,13 @@ npm run select         # pick the test account
 npm run test              # run all tests
 npm run test:web          # all web tests (Chromium)
 npm run test:app          # all app tests (Android viewport)
+npm run test:phone        # all web tests at phone viewport (400×800)
 npm run test:web <file>   # run tests/web/<file>.spec.ts
 npm run test:app <file>   # run tests/app/<file>.spec.ts
+npm run test:phone <file> # run tests/web/<file>.spec.ts at phone viewport
 npm run test:web:noauth   # same as test:web but skip auth
 npm run test:app:noauth   # same as test:app but skip auth
+npm run test:phone:noauth # same as test:phone but skip auth
 npm run test:app:all      # app tests (Android + iOS viewports)
 npm run test:headed       # run with visible browser
 npm run test:debug        # step-by-step debugger
@@ -44,6 +47,7 @@ npm run select            # switch active test account
 ```bash
 npm run test:web broadband              # tests/web/broadband.spec.ts
 npm run test:app broadband postsale     # tests/app/broadband.spec.ts, grep "postsale"
+npm run test:phone broadband postsale   # tests/web/broadband.spec.ts at phone viewport, grep "postsale"
 npm run test:app:noauth device          # tests/app/device.spec.ts, no auth
 npm run test:app:noauth device bau      # tests/app/device.spec.ts, grep "bau", no auth
 ```
@@ -61,7 +65,7 @@ tests/
   fixtures/         # Shared test fixtures
 playwright.config.ts
 scripts/
-  run-test.js       # CLI helper for test:web / test:app scripts
+  run-test.js       # CLI helper for test:web / test:app / test:phone scripts
 accounts.csv        # Test accounts — mark one row selected=true
 .env                # Local env — never commit
 .env.example        # Committed template
@@ -83,6 +87,7 @@ accounts.csv        # Test accounts — mark one row selected=true
 |---------|-----------|--------|
 | `web-chromium` | `tests/web/*.spec.ts` | Desktop Chrome |
 | `app-android` | `tests/app/*.spec.ts` | Galaxy S24 |
+| `web-phone` | `tests/web/*.spec.ts` | Desktop Chrome at 400×800 viewport |
 
 ## Auth flow
 

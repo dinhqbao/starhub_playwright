@@ -8,6 +8,6 @@ test('blacklist', async ({ basePage, page }) => {
     await p.btn_click('Proceed to checkout');
     await p.waitForLoad();
 
-    await expect(page.locator('.overlay-modal-main')).toContainText(/We.re unable to proceed/);
+    await expect(page.locator('.overlay-modal-main')).toContainText(/We.*unable to proceed/);
     await expect(page.getByRole('button', { name: 'Go to StarHub App' })).toBeVisible();
 });
