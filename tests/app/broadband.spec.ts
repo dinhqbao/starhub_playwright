@@ -4,7 +4,7 @@ import { expect } from '@playwright/test';
 test('presale - purchase', async ({ basePage, page }) => {
     const p = basePage('/Torpedo/BroadbandPlansSN');
 
-    await p.goto();
+    await p.openWithEmptyCart();
     await page.getByText('Home+ Core 5Gbps').click();
     await p.btn_click('Next');
     await p.btn_click('Skip');
@@ -18,7 +18,7 @@ test('presale - purchase', async ({ basePage, page }) => {
 test('postsale - transfer SN', async ({ basePage, page }) => {
     const p = basePage('/Torpedo/Broadband');
 
-    await p.goto(false);
+    await p.open();
     await page.locator('div[aa_linktext="Ready to renew"]').getByRole('link').click();
 
     await expect(

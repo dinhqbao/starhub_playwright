@@ -1,16 +1,16 @@
 import { Page, TestInfo } from '@playwright/test';
 import { WebPage } from '../pages/BasePage';
 
-export async function preorderSteps(page: Page, shouldClearCart = true) {
+export async function preorderSteps(page: Page) {
     const p = new WebPage(page, '/personal/pre-order/products?cat=Devices&launch=iphone15');
-    await p.goto(shouldClearCart);
+    await p.openWithEmptyCart();
     await page.getByText('iPhone 11 Pro', { exact: true }).click();
     await page.pause();
 }
 
-export async function bauSteps(page: Page, shouldClearCart = true) {
+export async function bauSteps(page: Page) {
     const p = new WebPage(page, '/personal/store/mobile/devices/');
-    await p.goto(shouldClearCart);
+    await p.openWithEmptyCart();
     await page.getByText('iPhone 11 Pro', { exact: true }).click();
     await page.pause();
 }

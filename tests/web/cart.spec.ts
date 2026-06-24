@@ -4,7 +4,7 @@ import { expect } from '@playwright/test';
 test('blacklist', async ({ basePage, page }) => {
     const p = basePage('/personal/revieworder');
 
-    await p.goto(false);
+    await p.open();
     await p.btn_click('Proceed to checkout');
     await p.waitForLoad();
 

@@ -13,7 +13,7 @@ async function checkSession(browser: Browser): Promise<boolean> {
     const ctx = await browser.newContext({ storageState: authFile });
     const page = await ctx.newPage();
     const sh = new WebPage(page, '/personal/store/mobile-plans');
-    await sh.goto(false);
+    await sh.open();
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await sh.waitForLoad();
 
@@ -54,7 +54,7 @@ setup('authenticate', async ({ browser }) => {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     const sh = new WebPage(page, '/personal/store/mobile-plans');
-    await sh.goto(false);
+    await sh.open();
     await page.locator('#b1-HeaderGroup').getByText('My Account', { exact: true }).click();
     await reAuthenticate(page);
     await ctx.storageState({ path: authFile });

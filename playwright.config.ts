@@ -8,11 +8,14 @@ dotenv.config();
 const BASE_URL = process.env.BASE_URL ?? 'https://starhubltd-tst.outsystemsenterprise.com';
 
 let authFile: string | undefined;
+let outputDir = 'test-results';
+
 if (process.env.NOAUTH !== 'true') {
     try {
         const selected = getSelectedAccount();
         const path = getAuthFilePath(selected.email);
         authFile = existsSync(path) ? path : undefined;
+        outputDir = `test-results/${selected.email}`;
     } catch {
         authFile = undefined;
     }
@@ -20,9 +23,9 @@ if (process.env.NOAUTH !== 'true') {
 
 const use = {
     headless: process.env.HEADLESS !== 'false',
-    trace: 'on-first-retry' as const,
-    screenshot: 'on' as const,
-    video: 'on' as const,
+    trace: 'on-first-retry',
+    screenshot: 'on',
+    video: 'on',
     launchOptions: {
         slowMo: Number(process.env.SLOW_MO) || 0,
     },
@@ -30,6 +33,7 @@ const use = {
 
 export default defineConfig({
     testDir: './tests',
+    outputDir,
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
@@ -38,7 +42,7 @@ export default defineConfig({
 
     timeout: 75_000,
     expect: {
-        timeout: 10_000,
+        timeout: 5_000,
     },
 
     use,
@@ -72,6 +76,7 @@ export default defineConfig({
                           baseURL: BASE_URL,
                           storageState: authFile,
                           viewport: { width: 400, height: 800 },
+                          isMobile: true,
                       },
                   },
               ]

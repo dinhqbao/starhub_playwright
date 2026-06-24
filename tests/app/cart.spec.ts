@@ -4,7 +4,7 @@ import { expect } from '@playwright/test';
 test('blacklist', async ({ basePage, page }) => {
     const p = basePage('/Torpedo/OneCart_ReviewOrder');
 
-    await p.goto(false);
+    await p.open();
     await p.btn_click('Proceed to checkout');
     await p.waitForLoad();
 

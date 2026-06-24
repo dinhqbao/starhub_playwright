@@ -3,7 +3,7 @@ import { appTest as test } from '../fixtures';
 test('buy bundle', async ({ basePage, page }) => {
     const p = basePage('/Torpedo/BundlePLP?Type=broadband-entertainment');
 
-    await p.goto();
+    await p.openWithEmptyCart();
     await page
         .locator('.bundle-content-item')
         .filter({ hasText: '10Gbps Ultraspeed + 1 Pass' })

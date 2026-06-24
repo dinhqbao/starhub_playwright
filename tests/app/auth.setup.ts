@@ -13,7 +13,7 @@ async function checkSession(browser: Browser): Promise<boolean> {
     const ctx = await browser.newContext({ storageState: authFile });
     const page = await ctx.newPage();
     const sh = new AppPage(page, '/Torpedo/More');
-    await sh.goto(false);
+    await sh.open();
     const isLoggedIn = !page.url().includes('LoginMain');
     if (isLoggedIn) await ctx.storageState({ path: authFile });
     await ctx.close();
@@ -43,7 +43,7 @@ setup('authenticate', async ({ browser }) => {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     const app_login = new AppPage(page, '/Torpedo/LoginMain');
-    await app_login.goto(false);
+    await app_login.open();
     await reAuthenticate(page);
     await ctx.storageState({ path: authFile });
     await ctx.close();

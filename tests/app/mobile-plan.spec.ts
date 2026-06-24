@@ -4,7 +4,7 @@ import { expect } from '@playwright/test';
 test('simo', async ({ basePage, page }) => {
     const p = basePage('/Torpedo/MobilePlans');
 
-    await p.goto();
+    await p.openWithEmptyCart();
     await page.getByText('5G Unlimited+ Core').click();
     await p.btn_click('Next');
     await page.getByText('Sign up for a new line').click();
@@ -16,7 +16,6 @@ test('simo', async ({ basePage, page }) => {
     await page.getByText('Block Overseas Calls').click();
     await page.getByText('Block Overseas SMSes').click();
     await p.btn_click('Next');
-
     await p.btn_click('Proceed to checkout');
     await p.waitForLoad();
 
