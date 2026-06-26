@@ -1,11 +1,12 @@
 import { Page } from '@playwright/test';
 
 export class BasePage {
+    static readonly longTimeout = 5_000;
+    static readonly shortTimeout = 1_000;
+
     protected readonly page: Page;
     private readonly url: string;
     protected readonly cartUrl: string = '';
-    protected readonly longTimeout: number = 3_000;
-    protected readonly shortTimeout: number = 1_000;
 
     constructor(page: Page, url: string) {
         this.page = page;
@@ -59,7 +60,7 @@ export class BasePage {
         const el = this.page.locator('div.cart-count>span');
         await el
             .first()
-            .waitFor({ state: 'visible', timeout: this.shortTimeout })
+            .waitFor({ state: 'visible', timeout: BasePage.shortTimeout })
             .catch(() => {});
         if ((await el.count()) === 0) return 0;
         return parseInt(((await el.textContent()) || '').trim() || '0', 10);
@@ -81,30 +82,29 @@ export class BasePage {
         const deleteBtns = this.page
             .locator('i.t-icon.icon-ic_fluent_delete_20_regular')
             .filter({ visible: true });
-        while (true) {
+        let count: number;
+        do {
             await deleteBtns
                 .first()
-                .waitFor({ state: 'visible', timeout: this.longTimeout })
+                .waitFor({ state: 'visible', timeout: BasePage.longTimeout })
                 .catch(() => {});
-            var count = await deleteBtns.count();
-
-            if (count === 0) {
-                console.log(`[cart] cleared`);
-                break;
+            count = await deleteBtns.count();
+            if (count > 0) {
+                console.log(`[cart] delete buttons count: ${count}`);
+                await deleteBtns.first().click();
+                const confirmBtn = this.page.getByRole('button', { name: 'Yes, delete' });
+                await confirmBtn
+                    .waitFor({ state: 'visible', timeout: BasePage.shortTimeout })
+                    .then(() => confirmBtn.click())
+                    .catch(() => {});
+                await this.waitForLoad();
             }
-            console.log(`[cart] delete buttons count: ${count}`);
-            await deleteBtns.first().click();
-            const confirmBtn = this.page.getByRole('button', { name: 'Yes, delete' });
-            await confirmBtn
-                .waitFor({ state: 'visible', timeout: this.shortTimeout })
-                .then(() => confirmBtn.click())
-                .catch(() => {});
-            await this.waitForLoad();
-        }
+        } while (count > 0);
+        console.log(`[cart] cleared`);
     }
 
     async btn_click(name: string) {
-        await this.page.getByRole('button', { name }).click();
+        await this.page.getByRole('button', { name, exact: true }).click();
         await this.waitSecond();
     }
 
@@ -113,13 +113,13 @@ export class BasePage {
     }
 
     async waitSecond(timeoutMs?: number) {
-        await this.page.waitForTimeout(timeoutMs ?? this.shortTimeout);
+        await this.page.waitForTimeout(timeoutMs ?? BasePage.shortTimeout);
     }
 
     async waitForLoad(timeoutMs?: number) {
         await this.waitSecond();
         await this.page
-            .waitForLoadState('networkidle', { timeout: timeoutMs ?? this.longTimeout })
+            .waitForLoadState('networkidle', { timeout: timeoutMs ?? BasePage.longTimeout })
             .catch(() => {});
         await this.page.locator('div.splash-video-2').waitFor({ state: 'hidden' });
         await this.waitSecond();

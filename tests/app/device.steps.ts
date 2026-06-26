@@ -1,5 +1,5 @@
 import { Page, TestInfo } from '@playwright/test';
-import { AppPage } from '../pages/BasePage';
+import { AppPage, BasePage } from '../pages/BasePage';
 
 export async function preorderSteps(page: Page) {
     const p = new AppPage(page, '/Torpedo/PreOrderProducts?launch=iphone15&cat=Devices');
@@ -8,9 +8,6 @@ export async function preorderSteps(page: Page) {
     await page.pause();
 }
 
-export async function bauSteps(page: Page) {
-    const p = new AppPage(page, '/Torpedo/Products?cat=Devices');
-    await p.openWithEmptyCart();
-    await page.getByText('iPhone 11 Pro', { exact: true }).click();
+export async function bauSteps(p: BasePage, page: Page) {
     await page.pause();
 }

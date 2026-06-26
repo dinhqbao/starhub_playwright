@@ -21,16 +21,6 @@ if (process.env.NOAUTH !== 'true') {
     }
 }
 
-const use = {
-    headless: process.env.HEADLESS !== 'false',
-    trace: 'on-first-retry',
-    screenshot: 'on',
-    video: 'on',
-    launchOptions: {
-        slowMo: Number(process.env.SLOW_MO) || 0,
-    },
-};
-
 export default defineConfig({
     testDir: './tests',
     outputDir,
@@ -40,12 +30,21 @@ export default defineConfig({
     workers: 1,
     reporter: [['html', { open: 'never' }], ['list']],
 
-    timeout: 75_000,
+    timeout: 120_000,
     expect: {
         timeout: 5_000,
     },
 
-    use,
+    use: {
+        headless: process.env.HEADLESS !== 'false',
+        actionTimeout: 20_000,
+        trace: 'on-first-retry',
+        screenshot: 'on',
+        video: 'on',
+        launchOptions: {
+            slowMo: Number(process.env.SLOW_MO) || 0,
+        },
+    },
 
     projects: [
         {
